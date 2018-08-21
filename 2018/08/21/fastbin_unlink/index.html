@@ -13,18 +13,27 @@
   
   
   
-  <title>koocola&#39;s blog</title>
+  <title>网鼎杯babyheap WP | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="koocola&apos;s blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="koocola&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="网鼎杯babyheap WP核心思路就是：先通过malloc 3个堆快(内容设置为P64(\x31)*3+”\x31”过掉fastbin分配时的检验),再free掉，通过show泄露出堆地址，再用edit函数更改fastbin的fd指针使新分配的fastbin能够覆盖下个堆快的size位为0x101（设此伪造的堆快为堆快一)，用malloc分配4个堆快，第四个堆快的内容设置为p64(0)+p64">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网鼎杯babyheap WP">
+<meta property="og:url" content="http://yoursite.com/2018/08/21/fastbin_unlink/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="koocola&apos;s blog">
+<meta property="og:description" content="网鼎杯babyheap WP核心思路就是：先通过malloc 3个堆快(内容设置为P64(\x31)*3+”\x31”过掉fastbin分配时的检验),再free掉，通过show泄露出堆地址，再用edit函数更改fastbin的fd指针使新分配的fastbin能够覆盖下个堆快的size位为0x101（设此伪造的堆快为堆快一)，用malloc分配4个堆快，第四个堆快的内容设置为p64(0)+p64">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/1.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/2.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/3.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/4.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/5.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/6.png">
+<meta property="og:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/8.png">
+<meta property="og:updated_time" content="2018-08-21T06:41:32.711Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="koocola&#39;s blog">
-<meta name="twitter:description" content="koocola&apos;s blog">
+<meta name="twitter:title" content="网鼎杯babyheap WP">
+<meta name="twitter:description" content="网鼎杯babyheap WP核心思路就是：先通过malloc 3个堆快(内容设置为P64(\x31)*3+”\x31”过掉fastbin分配时的检验),再free掉，通过show泄露出堆地址，再用edit函数更改fastbin的fd指针使新分配的fastbin能够覆盖下个堆快的size位为0x101（设此伪造的堆快为堆快一)，用malloc分配4个堆快，第四个堆快的内容设置为p64(0)+p64">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/21/fastbin_unlink/fastbin_unlink/1.png">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -65,17 +74,15 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main">
-  
-    <article id="post-fastbin_unlink" class="post-fastbin_unlink post type-post status-publish format-standard hentry">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-fastbin_unlink" class="post-fastbin_unlink post type-post status-publish format-standard hentry">
     <!---->
 
       <header class="entry-header">
         
         
   
-    <h1 class="entry-title">
-      <a class="article-title" href="/2018/08/21/fastbin_unlink/">网鼎杯babyheap WP</a>
+    <h1 class="entry-title article-title">
+      网鼎杯babyheap WP
     </h1>
   
 
@@ -118,59 +125,20 @@
 </article>
 
 
-
-
-
-
-  
-    <article id="post-doublefree" class="post-doublefree post type-post status-publish format-standard hentry">
-    <!---->
-
-      <header class="entry-header">
-        
-        
-  
-    <h1 class="entry-title">
-      <a class="article-title" href="/2018/08/04/doublefree/">double free学习</a>
-    </h1>
-  
-
-        
-        <div class="comments-link">
-            
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjl3cd0vy0000dcti1yfyik4m" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
-        </div><!-- .comments-link -->
-      </header><!-- .entry-header -->
-
-    <div class="entry-content">
-      
-        <p>first:<br></p>
-        
-          <p class="article-more-link">
-            <a href="/2018/08/04/doublefree/#more" class="more-link">More <span class="meta-nav">→</span></a>
-          </p>
-        
-      
-    </div><!-- .entry-content -->
-
-    <footer class="entry-meta">
-    <a href="/2018/08/04/doublefree/">
-    <time datetime="2018-08-04T12:43:20.000Z" class="entry-date">
-        2018-08-04
-    </time>
-</a>
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
     
     
-    </footer>
-</article>
+        <span class="nav-next"><a href="/2018/08/04/doublefree/" rel="next">double free学习 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
 
 
 
 
 
 
-  
-  
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">
