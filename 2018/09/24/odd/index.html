@@ -13,18 +13,19 @@
   
   
   
-  <title>Archives: 2018 | koocola&#39;s blog</title>
+  <title>零碎知识 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="koocola&apos;s blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="koocola&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/archives/2018/index.html">
+  <meta name="description" content="不定时更新，零碎知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="零碎知识">
+<meta property="og:url" content="http://yoursite.com/2018/09/24/odd/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="koocola&apos;s blog">
+<meta property="og:description" content="不定时更新，零碎知识">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-09-24T09:24:26.743Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="koocola&#39;s blog">
-<meta name="twitter:description" content="koocola&apos;s blog">
+<meta name="twitter:title" content="零碎知识">
+<meta name="twitter:description" content="不定时更新，零碎知识">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -65,30 +66,34 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-odd" class="post-odd post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
   
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/09/24/odd/">零碎知识</a>
+    <h1 class="entry-title article-title">
+      零碎知识
     </h1>
   
 
-  </header>
-  <footer class="entry-meta">
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/odd/" data-id="cjmg3djht0003swtip1rucmw7" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>不定时更新，零碎知识<br><a id="more"></a><br><strong>python调用C语言:</strong><br>        <strong>Windows下：</strong><br>    from ctypes import <em><br>    msvcrt = cdll.msvcrt<br>    msg = “Hello world!\n”<br>    msvcrt.printf(“Testing: %s”, msg)<br>        <strong>Linux下：</strong><br>    from ctypes import </em><br>    libc = CDLL(“libc.so.6”)<br>    msg = “Hello, world!\n”<br>    libc.printf(“Testing: %s”, msg)<br><strong>python结构体</strong><br>    class  xxx:   来定义<br>    初始化为结构体：xxx()<br>    在xxx里面可以加def <strong>init</strong>(self,arguments):用来定义结构体初始化操作<br>    加了后初始化结构体: xxx(arguments)<br><strong>IDA python</strong><br>    PatchByte/Word/Dword/Qword(addr,value)<br>    Byte(addr)  //get byte<br><strong>printf</strong><br>    x64下格式化字符串漏洞和X86下不同的利用点在于X64下前六个参数是存储在寄存器（RDI,RSI,RDX,RCX,R8和R9)中的，所以%$nx<br>    (1=&lt;n&lt;=6)获取的是寄存器的值，只有n&gt;=7时才开始获取栈中的值，而X86下则为直接从栈中取值<br><strong>fork()函数</strong><br>    fork函数的目的是创建一个子进程他给父进程返回1，给子进程返回0，如果返回值为负数，那么说明创建子进程失败。<br>    fork()函数创建的子进程从当前fork()的位置开始向后执行，fork()起了一个将当前环境拷贝给子进程的作用。<br>    fork函数创建的子进程和主进程之间的交互主要靠pipe(管道),<br>    pipe(pipedes)开启管道返回值大于等于0成功<br>    pipedes[0]为从管道里读数据，pipedes[1]为从管道内写入数据。<br>    如:<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read(pipedes[0], &amp;s, n);</span><br><span class="line">	write(pipedes[1], &amp;s, n);</span><br></pre></td></tr></table></figure></p>
+<pre><code>wait()函数用来回收僵尸进程(结束了但还存在的进程)
+</code></pre>
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
     <a href="/2018/09/24/odd/">
     <time datetime="2018-09-24T09:22:20.000Z" class="entry-date">
         2018-09-24
@@ -98,79 +103,22 @@
     
     </footer>
 </article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/08/23/ssp_leak/">ssp leak</a>
-    </h1>
-  
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/08/23/ssp_leak/">
-    <time datetime="2018-08-23T09:45:20.000Z" class="entry-date">
-        2018-08-23
-    </time>
-</a>
-    
-    
-    </footer>
-</article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/08/21/fastbin_unlink/">网鼎杯babyheap WP</a>
-    </h1>
-  
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/08/21/fastbin_unlink/">
-    <time datetime="2018-08-21T06:15:20.000Z" class="entry-date">
-        2018-08-21
-    </time>
-</a>
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
     
     
-    </footer>
-</article>
-  
+        <span class="nav-next"><a href="/2018/08/23/ssp_leak/" rel="next">ssp leak <span class="meta-nav">→</span></a></span>
     
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/08/04/doublefree/">double free学习</a>
-    </h1>
-  
+</nav><!-- .nav-single -->
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/08/04/doublefree/">
-    <time datetime="2018-08-04T12:43:20.000Z" class="entry-date">
-        2018-08-04
-    </time>
-</a>
-    
-    
-    </footer>
-</article>
-  
-  
-    </div></section>
-  
+
+
+
+
+
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">
