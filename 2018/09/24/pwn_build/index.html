@@ -22,7 +22,7 @@
 <meta property="og:site_name" content="koocola&#39;s blog">
 <meta property="og:description" content="收集的资料">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-24T09:40:35.908Z">
+<meta property="og:updated_time" content="2018-09-29T07:53:07.690Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pwn环境的简单部署">
 <meta name="twitter:description" content="收集的资料">
@@ -81,7 +81,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/pwn_build/" data-id="cjmmnf7dj0001ggtie7tqj4ta" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/pwn_build/" data-id="cjmoxwvpz0002wgtieqwsinb6" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -95,6 +95,7 @@
 <p>docker stop <container id=""> 停止容器</container></p>
 <p>docker rm <container id=""> 删除容器</container></p>
 <p>docker ps -a 查看所有容器</p>
+<p>参数 $(docker ps -a | awk ‘{ print $1}’ | tail -n +2)  对所有容器进行操作</p>
 <p>停止所有的container，这样才能够删除其中的images：<br>docker stop $(docker ps -a -q)</p>
 <p>如果想要删除所有container的话再加一个指令：<br>/home/ctf/lib64/ld-linux-x86-64.so.2<br>docker rm $(docker ps -a -q)</p>
 <p>2.查看当前有些什么images<br>docker images</p>
@@ -129,6 +130,8 @@
 <nav class="nav-single">
     <h3 class="assistive-text">文章导航</h3>
     
+        <span class="nav-previous"><a href="/2018/09/30/death_note/" rel="prev"><span class="meta-nav">←</span> pwnable.tw death_note</a></span>
+    
     
         <span class="nav-next"><a href="/2018/09/24/odd/" rel="next">零碎知识 <span class="meta-nav">→</span></a></span>
     
@@ -161,6 +164,10 @@
       <ul>
         
           <li>
+            <a href="/2018/09/30/death_note/">pwnable.tw death_note</a>
+          </li>
+        
+          <li>
             <a href="/2018/09/24/pwn_build/">pwn环境的简单部署</a>
           </li>
         
@@ -174,10 +181,6 @@
         
           <li>
             <a href="/2018/08/21/fastbin_unlink/">网鼎杯babyheap WP</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/04/doublefree/">double free学习</a>
           </li>
         
       </ul>
