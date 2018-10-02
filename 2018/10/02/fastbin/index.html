@@ -15,14 +15,17 @@
   
   <title>fastbin attack的一种思路 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="曲线救国">
+<meta property="og:type" content="article">
 <meta property="og:title" content="fastbin attack的一种思路">
 <meta property="og:url" content="http://yoursite.com/2018/10/02/fastbin/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
+<meta property="og:description" content="曲线救国">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-02T13:19:10.959Z">
+<meta property="og:updated_time" content="2018-10-02T13:20:27.617Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="fastbin attack的一种思路">
+<meta name="twitter:description" content="曲线救国">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -78,21 +81,14 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/02/fastbin/" data-id="cjmrr296k0001fgti8ix9qo4e" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/02/fastbin/" data-id="cjmrr4eqp0002k8ti389628m4" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <hr>
-<a id="more"></a>
-<pre><code>**1、**
-覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值
-**2、**
-这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10
-**3、**
-再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了
-</code></pre>
+        <p>曲线救国<br><a id="more"></a><br>    <strong>1、</strong><br>    覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值<br>    <strong>2、</strong><br>    这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10<br>    <strong>3、</strong><br>    再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了</p>
+
       
     </div><!-- .entry-content -->
 
