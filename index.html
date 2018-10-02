@@ -67,6 +67,55 @@
       <div id="main" class="wrapper">
         <div id="primary" class="site-content"><div id="content" role="main">
   
+    <article id="post-fastbin" class="post-fastbin post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title">
+      <a class="article-title" href="/2018/10/02/fastbin/">fastbin attack的一种思路</a>
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/02/fastbin/" data-id="cjmrr09650000a8tipmcv6rtp" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <a id="more"></a>
+<pre><code>**1、**
+覆盖堆快的fd指针值为(0x0-0x80)中适合构造的值
+**2、**
+这时候在main_arena中有该值存在，我们分配堆快到main_arena中再覆盖top_chunk的值为malloc_hook-0x10
+**3、**
+再分配堆快就会从malloc_hook-0x10开始分配，然后覆盖Malloc_hook为one_gadget再分配一个堆快就getshell了
+</code></pre>
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2018/10/02/fastbin/">
+    <time datetime="2018-10-02T13:16:20.000Z" class="entry-date">
+        2018-10-02
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+
+
+
+
+  
     <article id="post-death_note" class="post-death_note post type-post status-publish format-standard hentry">
     <!---->
 
@@ -82,7 +131,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/30/death_note/" data-id="cjmoxwvpx0001wgtihcskqr7t" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/30/death_note/" data-id="cjmrr096e0002a8tiomz6by06" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -129,7 +178,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/pwn_build/" data-id="cjmoxwvpz0002wgtieqwsinb6" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/pwn_build/" data-id="cjmrr096i0006a8ti6cc8dmh4" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -176,7 +225,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/odd/" data-id="cjmoxwvq00003wgtipbb8nan3" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/odd/" data-id="cjmrr096g0004a8ti83z7l7g5" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -223,7 +272,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/23/ssp_leak/" data-id="cjmoxwvqc0005wgtir5n9817e" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/23/ssp_leak/" data-id="cjmrr096h0005a8ti1vym4x8q" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -270,7 +319,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/21/fastbin_unlink/" data-id="cjmoxwvq10004wgtistmcomnf" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/21/fastbin_unlink/" data-id="cjmrr096f0003a8tixijougzy" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -317,7 +366,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjmoxwvps0000wgti3dkeisbd" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/08/04/doublefree/" data-id="cjmrr096b0001a8ti3fs2ftpp" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -372,6 +421,10 @@
       <ul>
         
           <li>
+            <a href="/2018/10/02/fastbin/">fastbin attack的一种思路</a>
+          </li>
+        
+          <li>
             <a href="/2018/09/30/death_note/">pwnable.tw death_note</a>
           </li>
         
@@ -385,10 +438,6 @@
         
           <li>
             <a href="/2018/08/23/ssp_leak/">ssp leak</a>
-          </li>
-        
-          <li>
-            <a href="/2018/08/21/fastbin_unlink/">网鼎杯babyheap WP</a>
           </li>
         
       </ul>
