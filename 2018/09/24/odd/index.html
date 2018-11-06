@@ -22,7 +22,7 @@
 <meta property="og:site_name" content="koocola&#39;s blog">
 <meta property="og:description" content="不定时更新，零碎知识">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-24T09:24:26.743Z">
+<meta property="og:updated_time" content="2018-11-06T03:32:09.426Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="零碎知识">
 <meta name="twitter:description" content="不定时更新，零碎知识">
@@ -81,7 +81,7 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/odd/" data-id="cjn1qwzkv000714tip9rp1pyu" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/24/odd/" data-id="cjo56izp20004lwtijkjc6p5m" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -89,7 +89,53 @@
       
         <p>不定时更新，零碎知识<br><a id="more"></a><br><strong>python调用C语言:</strong><br>        <strong>Windows下：</strong><br>    from ctypes import <em><br>    msvcrt = cdll.msvcrt<br>    msg = “Hello world!\n”<br>    msvcrt.printf(“Testing: %s”, msg)<br>        <strong>Linux下：</strong><br>    from ctypes import </em><br>    libc = CDLL(“libc.so.6”)<br>    msg = “Hello, world!\n”<br>    libc.printf(“Testing: %s”, msg)<br><strong>python结构体</strong><br>    class  xxx:   来定义<br>    初始化为结构体：xxx()<br>    在xxx里面可以加def <strong>init</strong>(self,arguments):用来定义结构体初始化操作<br>    加了后初始化结构体: xxx(arguments)<br><strong>IDA python</strong><br>    PatchByte/Word/Dword/Qword(addr,value)<br>    Byte(addr)  //get byte<br><strong>printf</strong><br>    x64下格式化字符串漏洞和X86下不同的利用点在于X64下前六个参数是存储在寄存器（RDI,RSI,RDX,RCX,R8和R9)中的，所以%$nx<br>    (1=&lt;n&lt;=6)获取的是寄存器的值，只有n&gt;=7时才开始获取栈中的值，而X86下则为直接从栈中取值<br><strong>fork()函数</strong><br>    fork函数的目的是创建一个子进程他给父进程返回1，给子进程返回0，如果返回值为负数，那么说明创建子进程失败。<br>    fork()函数创建的子进程从当前fork()的位置开始向后执行，fork()起了一个将当前环境拷贝给子进程的作用。<br>    fork函数创建的子进程和主进程之间的交互主要靠pipe(管道),<br>    pipe(pipedes)开启管道返回值大于等于0成功<br>    pipedes[0]为从管道里读数据，pipedes[1]为从管道内写入数据。<br>    如:<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read(pipedes[0], &amp;s, n);</span><br><span class="line">	write(pipedes[1], &amp;s, n);</span><br></pre></td></tr></table></figure></p>
 <pre><code>wait()函数用来回收僵尸进程(结束了但还存在的进程)
-</code></pre>
+</code></pre><p><strong>linux shell编程</strong><br>        echo代表输处后面的话到用户界面<br>        $+变量名表示使用变量<br>        $* 表示所有参数<br>        $# 表示参数个数<br>        $i 代表第i个参数<br>        $? 上个函数的返回值<br>        1旁边的哪个引号表示在shell中执行一段命令<br>        read命令可读取参数<br>        后面不跟参数的话赋值给内置变量REPLY<br><strong>if用法</strong><br>        if (test condition) then<br>              commands<br>        else<br>              commands<br>        fi<br>        fi表示if结束，test表示判断condition是否成立<br>        while [ expr ] ;(有个分号)<br>        do<br>            commands<br>        done<br>        exit code 表示退出当前shell<br><strong>date</strong><br>        用来输出系统时间<br>        用法 date “+%Y.%m.%d  %H:%M:%S”<br>        -d 选项也是经常要用到的，它可以打印n天前或者n天后的日期，当然也可以打印n个月/年前或者后的日期。<br>        date -d “-1 month” “+%Y.%m.%d  %H:%M:%S”<br>        %w表示星期几<br><strong>sleep</strong><br>        sleep n 休眠n秒<br>执行脚本时加-x参数表示输出执行的语句<br>read -p “  xxxxx” a    ==python中的input(“xxxxx”)<br><strong>判断文件是否存在</strong><br>    shell 脚本中if还经常判断关于档案属性，比如判断是普通文件还是目录，判断文件是否有读写执行权限等。常用的也就几个选项：</p>
+<p>-e ：判断文件或目录是否存在</p>
+<p>-d ：判断是不是目录，并是否存在</p>
+<p>-f ：判断是否是普通文件，并存在</p>
+<p>-r ：判断文档是否有读权限</p>
+<p>-w ：判断是否有写权限</p>
+<p>-x ：判断是否可执行</p>
+<p>使用if判断时，具体格式为： if [ -e filename ] ; then<br><strong>计算</strong><br>        sum=$(($a+$b))  sum=a+b<br><strong>grep命令</strong></p>
+<p><strong>选项与参数：</strong><br>-a ：将 binary 文件以 text 文件的方式搜寻数据<br>-c ：计算找到 ‘搜寻字符串’ 的次数<br>-i ：忽略大小写的不同，所以大小写视为相同<br>-n ：顺便输出行号<br>-v ：反向选择，亦即显示出没有 ‘搜寻字符串’ 内容的那一行<br>–color=auto ：可以将找到的关键词部分加上颜色的显示<br><strong>根据文件内容递归查找目录</strong><br> grep ‘energywise’ <em>           #在当前目录搜索带’energywise’行的文件<br> grep -r ‘energywise’ </em>        #在当前目录及其子目录下搜索’energywise’行的文件<br> grep -l -r ‘energywise’ *     #在当前目录及其子目录下搜索’energywise’行的文件，但是不显示匹配的行，只显示匹配的文件</p>
+<p>  <strong>字符类</strong></p>
+<p>字符类的搜索：如果我想要搜寻 test 或 taste 这两个单字时，可以发现到，其实她们有共通的 ‘t?st’ 存在～这个时候，我可以这样来搜寻：<br>[root@www ~]# grep -n ‘t[ae]st’ regular_express.txt<br>8:I can’t finish the test.<br>9:Oh! The soup taste good.</p>
+<p> <strong>字符类的反向选择 [^] ：</strong><br> 如果想要搜索到有 oo 的行，但不想要 oo 前面有 g，如下</p>
+<p> [root@www ~]# grep -n ‘[^g]oo’ regular_express.txt<br>2:apple is my favorite food.<br>3:Football game is not use feet only.<br>18:google is the best tools for search keyword.<br>19:goooooogle yes!<br>虽然18行开头goo被忽略了，但tools有’oo’所以还是显示出来了</p>
+<p><strong>grep -n ‘[^a-z]oo’ regular_express.txt</strong><br>表示不想要oo前面有小写字母<br>当我们在一组集合字节中，如果该字节组是连续的，例如大写英文/小写英文/数字等等， 就可以使用[a-z],[A-Z],[0-9]等方式来书写，那么如果我们的要求字串是数字与英文呢就将他全部写在一起，变成：[a-zA-Z0-9]</p>
+<p><strong>如果^号在括号外如:</strong><br>[root@www ~]# grep -n ‘^the’ regular_express.txt<br>12:the symbol ‘*’ is represented as start.<br>[root@www ~]# grep -n ‘^[a-z]’ regular_express.txt<br>2:apple is my favorite food.<br>表示只想要开头出现<br><strong>如果把^换成$表示指向在结尾出现</strong></p>
+<p><strong>grep -n ‘^$’ regular_express.txt表示搜索空白行</strong></p>
+<p><strong>任意一个字节 . 与重复字节的星号</strong></p>
+<p>这两个符号在正则表达式的意义如下：<br>. (小数点)：代表『一定有一个任意字节』的意思；</p>
+<ul>
+<li>(星号)：代表『重复前一个字符， 0 到无穷多次』的意思，为组合形态<br>假设我需要找出 g??d 的字串，亦即共有四个字节， 起头是 g 而结束是 d ，我可以这样做：<br>[root@www ~]# grep -n ‘g..d’ regular_express.txt<br>1:”Open Source” is a good mechanism to develop programs.<br>9:Oh! The soup taste good.<br>16:The world <happy> is the same with “glad”.<br>因为强调 g 与 d 之间一定要存在两个字节，因此，第 13 行的 god 与第 14 行的 gd 就不会被列出来了</happy></li>
+</ul>
+<p><strong>搜索点号和星号需要用\转义</strong></p>
+<p><strong>如果我想要找出 g 开头与 g 结尾的行，当中的字符可有可无</strong></p>
+<p>[root@www ~]# grep -n ‘g.*g’ regular_express.txt</p>
+<p><strong>限定连续 RE 字符范围 {}</strong><br>我们可以利用 . 与 RE 字符及 * 来配置 0 个到无限多个重复字节， 那如果我想要限制一个范围区间内的重复字节数呢？</p>
+<p>举例来说，我想要找出两个到五个 o 的连续字串，该如何作？这时候就得要使用到限定范围的字符 {} 了。 但因为 { 与 } 的符号在 shell 是有特殊意义的，因此， 我们必须要使用字符   \ 来让他失去特殊意义才行。 至於 {} 的语法是这样的，<br><strong>假设我要找到两个 o 的字串，可以是：</strong><br>[root@www ~]# grep -n ‘o{2}‘ regular_express.txt<br><strong>假设我们要找出 g 后面接 2 到 5 个 o ，然后再接一个 g 的字串，他会是这样</strong>：<br>[root@www ~]# grep -n ‘go{2,5}g’ regular_express.txt</p>
+<p><strong>ps命令</strong><br><strong>kill命令</strong><br><strong>python pwntools库</strong><br>    用于debug:<br>    Set context.log_level = ‘debug’ when troubleshooting your exploit<br>设置<br>lisen(port):<br>    用于监听窗口。<br>    l=listen(xxx)<br>    l.spawn_process(“”)在该窗口运行某条命令<br>    l.wait_for_connection()等待连接<br>连接方式三种:<br>remote<br>process<br>ssh(host=’XXX’, user=’XXX’, password=’XXX’)<br>    connect_remote ,在ssh下的remote</p>
+<pre><code>connected(ssh成功返回1，否则返回0)
+
+download(file_or_directory, local=&quot;本地存放目录&quot;)
+</code></pre><p>settimeout(n) 设定一条指令的最长执行时间</p>
+<pre><code>unrecv( ) 增加未接收的信息
+</code></pre><p>cyclic(length=None, alphabet=None, n=None)  自动生成可计算距离的字符串<br>    length 参数为生成的字符串长度<br>    alphabet表明字符串的类型(范围)<br>    n表明以多少为计算单位<br>    如：<br>    cyclic(20, n=8)<br>         ‘aaaaaaaabaaaaaaacaaa’<br>     cyclic(20,string.printable,4)<br>        ‘00001000200030004000<br>asm<br>汇编<br>disasm<br>反汇编<br>shellcraft.sh( ):<br>用来生成一般shellcode<br>要在context里设定arch,os,bits的值<br>生成linux下32位下的shellcode<br>context.bits=32<br>;;;;<br>context.arch=”amd64  64位”||”arm”||”i386”||”mips”<br>asm(shellcraft.sh())<br>64位:<br>context.bits=64<br>asm(shellcraft.sh())<br>ELF<br>    ELF.symbols[‘’]<br>    ELF.got[‘’]<br>    ELF.plt[‘’]<br>    ELF.functions[‘’]<br>调试:<br>    一种是刚开始用process建立，后来用gdb.attach()附加进行调试<br>    第二种是直接让 p=gdb.attach(“XX”,”what you want gdb do”)<br>    第二种方法的好处就是假如你执行一句语句，语句执行的时候会执行某个函数，你想在这个函数下断点，这个时候如果用第一种方法是断不住的，而第二种方法可以让你<br>在语句执行前下断点，就能断住了<br>DynELF(leak(用于泄露的函数),elf=(已知ELF文件对应的路径))<br>可用于泄露Libc地址，heap基址，stack地址等<br>    使用举例<br>    d=DynELF(leak,elf=(“XX”)) (leak(address,length=n))<br>    system_addr=d.lookup(“system”,”libc”) system函数地址<br>    system_addr=d.lookup(None,”libc”) libc基址<br>    heap=d.heap()<br>    stack=d.stack()<br>fmtstr<br>要先建立一个能根据输入泄露的函数<br>然后f=FmtStr(leak_function, offset=X,numbwritten=X)<br>offset 为字符串第一个字节的偏移<br>f.write(target,value)  ；任意地址写<br>f,read(target,value)  任意地址读<br>        self.execute_fmt(fmtstr) # 执行fmtstr<br>memleak#<br>ROP #<br>SROP<br>frame=SigreturnFrame()   #生成sigretrun的上下文<br>frame.rip=syscall   #设置各寄存器信息<br>frame.rax=0<br>frame.rdi=0<br>frame.rsi=stack_addr<br>frame.rdx=0x400<br>frame.rsp=stack_addr</p>
+<p>repr能把\x00等输出<br>flat函数  整合输入的数把他转化成p64或p32的形式，由context.arch(bits)决定位数<br>python<br><strong>map</strong><br>map()函数<br>map()是 Python 内置的高阶函数，它接收一个函数 f 和一个 list，并通过把函数 f 依次作用在 list 的每个元素上，得到一个新的 list 并返回。<br>例如，对于list [1, 2, 3, 4, 5, 6, 7, 8, 9]<br>如果希望把list的每个元素都作平方，就可以用map()函数：<br>因此，我们只需要传入函数f(x)=x*x，就可以利用map()函数完成这个计算：</p>
+<p>def f(x):<br>    return x*x<br>print map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])<br>输出结果：</p>
+<p>[1, 4, 9, 10, 25, 36, 49, 64, 81]<br>注意：map()函数不改变原有的 list，而是返回一个新的 list。</p>
+<p>利用map()函数，可以把一个 list 转换为另一个 list，只需要传入转换函数。<br><strong>join()函数</strong></p>
+<p>语法：  ‘sep’.join(seq)</p>
+<p>参数说明<br>sep：分隔符。可以为空<br>seq：要连接的元素序列、字符串、元组、字典<br>上面的语法即：以sep作为分隔符，将seq所有的元素合并成一个新的字符串<br>返回值：返回一个以分隔符sep连接各个元素后生成的字符串</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>seq1 = [‘hello’,’good’,’boy’,’doiido’]<br>print ‘ ‘.join(seq1)<br>hello good boy doiido<br>print ‘:’.join(seq1)<br>hello:good:boy:doiido</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
       
     </div><!-- .entry-content -->
 
