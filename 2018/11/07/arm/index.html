@@ -13,18 +13,20 @@
   
   
   
-  <title>Archives: 2018/10 | koocola&#39;s blog</title>
+  <title>mips、arm  环境部署及调试 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="koocola&apos;s blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="koocola&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/archives/2018/10/index.html">
+  <meta name="description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
+<meta name="keywords" content=".">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mips、arm  环境部署及调试">
+<meta property="og:url" content="http://yoursite.com/2018/11/07/arm/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="koocola&apos;s blog">
+<meta property="og:description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-07T09:27:49.547Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="koocola&#39;s blog">
-<meta name="twitter:description" content="koocola&apos;s blog">
+<meta name="twitter:title" content="mips、arm  环境部署及调试">
+<meta name="twitter:description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -65,89 +67,63 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-arm" class="post-arm post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
   
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/09/malloc/">malloc</a>
+    <h1 class="entry-title article-title">
+      mips、arm  环境部署及调试
     </h1>
   
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/10/09/malloc/">
-    <time datetime="2018-10-09T13:12:20.000Z" class="entry-date">
-        2018-10-09
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/11/07/arm/" data-id="cjo6ynpsd0001lsti5w26jpm5" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>环境搭建：<a href="https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain" target="_blank" rel="noopener">https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain</a><br><strong>查看被占用的端口ID:</strong><br>    sudo lsof -i:port<br><strong>kill掉该进程</strong><br>sudo kill -9 850<br><strong>调试</strong><br>先在qemu下打开<br>     qemu-aarch64(architecture type) -g port -L /usr/aarch64-linux-gnu/(lib directory) ./pwn<br>然后用gdb-multiarch调试<br>set architecture aarch64 (设置汇编)<br>target remote localhost:1234<br>就能够进行调试</p>
+<p><strong>如果直接运行报错</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/</span><br></pre></td></tr></table></figure></p>
+<p>设置好环境变量就能够运行了</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2018/11/07/arm/">
+    <time datetime="2018-11-07T09:27:20.000Z" class="entry-date">
+        2018-11-07
     </time>
 </a>
     
     
-    </footer>
-</article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/06/SROP/">SROP</a>
-    </h1>
-  
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/">.</a></li></ul>
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/10/06/SROP/">
-    <time datetime="2018-10-06T00:29:20.000Z" class="entry-date">
-        2018-10-06
-    </time>
-</a>
-    
-    
     </footer>
 </article>
-  
-    
-    
-    <article class="post type-post status-publish format-standard hentry archive-type-post">
-  <header class="entry-header">
-      
-  
-    <h1 class="entry-title">
-      <a class="archive-article-title" href="/2018/10/02/fastbin/">IO_FILE劫持总结</a>
-    </h1>
-  
 
-  </header>
-  <footer class="entry-meta">
-    <a href="/2018/10/02/fastbin/">
-    <time datetime="2018-10-02T13:16:20.000Z" class="entry-date">
-        2018-10-02
-    </time>
-</a>
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
     
     
-    </footer>
-</article>
-  
-  
-    </div></section>
-  
+        <span class="nav-next"><a href="/2018/10/09/malloc/" rel="next">malloc <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">
