@@ -15,18 +15,17 @@
   
   <title>mips、arm  环境部署及调试 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
-<meta name="keywords" content=".">
+  <meta name="description" content=".">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mips、arm  环境部署及调试">
 <meta property="og:url" content="http://yoursite.com/2018/11/07/arm/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
+<meta property="og:description" content=".">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-07T09:27:49.547Z">
+<meta property="og:updated_time" content="2018-11-07T10:58:55.732Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mips、arm  环境部署及调试">
-<meta name="twitter:description" content="环境搭建：https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain查看被占用的端口ID:    sudo lsof -i:portkill掉该进程sudo kill -9 850调试先在qemu下打开     qemu-aarch6">
+<meta name="twitter:description" content=".">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -82,13 +81,13 @@
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/11/07/arm/" data-id="cjo6ynpsd0001lsti5w26jpm5" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/11/07/arm/" data-id="cjo71wywm0000f0tifczjvoag" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <p>环境搭建：<a href="https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain" target="_blank" rel="noopener">https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain</a><br><strong>查看被占用的端口ID:</strong><br>    sudo lsof -i:port<br><strong>kill掉该进程</strong><br>sudo kill -9 850<br><strong>调试</strong><br>先在qemu下打开<br>     qemu-aarch64(architecture type) -g port -L /usr/aarch64-linux-gnu/(lib directory) ./pwn<br>然后用gdb-multiarch调试<br>set architecture aarch64 (设置汇编)<br>target remote localhost:1234<br>就能够进行调试</p>
+        <p>.<br><a id="more"></a><br>环境搭建：<a href="https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain" target="_blank" rel="noopener">https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain</a><br><strong>查看被占用的端口ID:</strong><br>    sudo lsof -i:port<br><strong>kill掉该进程</strong><br>sudo kill -9 850<br><strong>调试</strong><br>先在qemu下打开<br>     qemu-aarch64(architecture type) -g port -L /usr/aarch64-linux-gnu/(lib directory) ./pwn<br>然后用gdb-multiarch调试<br>set architecture aarch64 (设置汇编)<br>target remote localhost:1234<br>就能够进行调试</p>
 <p><strong>如果直接运行报错</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/</span><br></pre></td></tr></table></figure></p>
 <p>设置好环境变量就能够运行了</p>
 
@@ -103,9 +102,6 @@
 </a>
     
     
-  <span class="article-delim">&#8226;</span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/">.</a></li></ul>
-
     </footer>
 </article>
 
@@ -171,22 +167,8 @@
 
   
     
-  <aside class="widget">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget-content">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/">.</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </aside>
-
   
     
-  <aside class="widget">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget-content tagcloud">
-      <a href="/tags/" style="font-size: 10px;">.</a>
-    </div>
-  </aside>
-
   
 </div>
       </div>
