@@ -13,19 +13,18 @@
   
   
   
-  <title>mips、arm  环境部署及调试 | koocola&#39;s blog</title>
+  <title>Archives: 201 | koocola&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content=".">
-<meta property="og:type" content="article">
-<meta property="og:title" content="mips、arm  环境部署及调试">
-<meta property="og:url" content="http://yoursite.com/2018/11/07/arm/index.html">
+  <meta name="description" content="koocola&apos;s blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="koocola&#39;s blog">
+<meta property="og:url" content="http://yoursite.com/archives/201/index.html">
 <meta property="og:site_name" content="koocola&#39;s blog">
-<meta property="og:description" content=".">
+<meta property="og:description" content="koocola&apos;s blog">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-11-07T11:03:07.626Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="mips、arm  环境部署及调试">
-<meta name="twitter:description" content=".">
+<meta name="twitter:title" content="koocola&#39;s blog">
+<meta name="twitter:description" content="koocola&apos;s blog">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -66,60 +65,43 @@
     </nav>
 </header>
       <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-arm" class="post-arm post type-post status-publish format-standard hentry">
-    <!---->
-
-      <header class="entry-header">
-        
-        
+        <div id="primary" class="site-content"><div id="content" role="main">
   
-    <h1 class="entry-title article-title">
-      mips、arm  环境部署及调试
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/201" class="archive-year">201</a>
+        </div>
+        <div class="archives">
+    
+    <article class="post type-post status-publish format-standard hentry archive-type-post">
+  <header class="entry-header">
+      
+  
+    <h1 class="entry-title">
+      <a class="archive-article-title" href="/0201/02/02/C/">通过C++的异常机制绕过canary</a>
     </h1>
   
 
-        
-        <div class="comments-link">
-            
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2018/11/07/arm/" data-id="cjrmt4i2v00033gti1mk6zm0r" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
-        </div><!-- .comments-link -->
-      </header><!-- .entry-header -->
-
-    <div class="entry-content">
-      
-        <p>.<br><a id="more"></a><br>环境搭建：<a href="https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain" target="_blank" rel="noopener">https://reverseengineering.stackexchange.com/questions/8829/cross-debugging-for-arm-mips-elf-with-qemu-toolchain</a><br>各种库都可以用apt来安装<br><strong>查看被占用的端口ID:</strong><br>    sudo lsof -i:port<br><strong>kill掉该进程</strong><br>sudo kill -9 850<br><strong>调试</strong><br>先在qemu下打开<br>     qemu-aarch64(architecture type) -g port -L /usr/aarch64-linux-gnu/(lib directory) ./pwn<br><strong>socat 搭建</strong><br>socat tcp-l:10002,fork exec:”qemu-aarch64 -g 1234  -L /usr/aarch64-linux-gnu ./pwn”,reuseaddr<br>然后用gdb-multiarch调试<br>set architecture aarch64 (设置汇编)<br>target remote localhost:1234<br>就能够进行调试</p>
-<p><strong>如果直接运行报错</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu/</span><br></pre></td></tr></table></figure></p>
-<p>设置好环境变量就能够运行了<br>参考：<a href="https://xz.aliyun.com/t/3154" target="_blank" rel="noopener">https://xz.aliyun.com/t/3154</a></p>
-
-      
-    </div><!-- .entry-content -->
-
-    <footer class="entry-meta">
-    <a href="/2018/11/07/arm/">
-    <time datetime="2018-11-07T09:27:20.000Z" class="entry-date">
-        2018-11-07
+  </header>
+  <footer class="entry-meta">
+    <a href="/0201/02/02/C/">
+    <time datetime="0201-02-02T01:13:20.000Z" class="entry-date">
+        0201-02-02
     </time>
 </a>
     
     
     </footer>
 </article>
-
-
-    
-<nav class="nav-single">
-    <h3 class="assistive-text">文章导航</h3>
-    
-    
-        <span class="nav-next"><a href="/2018/10/09/malloc/" rel="next">malloc <span class="meta-nav">→</span></a></span>
-    
-</nav><!-- .nav-single -->
-
-
-
-
-
-
+  
+  
+    </div></section>
+  
 
 </div></div>
         <div id="secondary" class="widget-area" role="complementary">
